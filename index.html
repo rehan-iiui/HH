@@ -1,0 +1,4325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build & Buy Planner</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+
+:root{
+  --bg:#0b1020;
+  --panel:#121a2d;
+  --panel2:#18223a;
+  --text:#f4f7ff;
+  --muted:#9ba8c2;
+  --line:#283653;
+  --accent:#6c63ff;
+  --accent2:#00c6ff;
+  --green:#25d695;
+  --orange:#ffad42;
+  --red:#ff5d73;
+  --shadow:0 20px 60px rgba(0,0,0,.28);
+}
+
+body.light{
+  --bg:#eef2f8;
+  --panel:#ffffff;
+  --panel2:#f5f7fb;
+  --text:#182033;
+  --muted:#667085;
+  --line:#dce2ed;
+  --shadow:0 15px 45px rgba(25,40,70,.12);
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(108,99,255,.18),transparent 28%),
+    radial-gradient(circle at 90% 10%,rgba(0,198,255,.13),transparent 25%),
+    var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.app{
+  display:flex;
+  min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:255px;
+  background:rgba(10,16,31,.88);
+  border-right:1px solid var(--line);
+  padding:22px 15px;
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  z-index:20;
+  backdrop-filter:blur(18px);
+}
+
+body.light .sidebar{
+  background:rgba(255,255,255,.9);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:7px 10px 24px;
+}
+
+.logo-icon{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 10px 30px rgba(108,99,255,.25);
+}
+
+.logo h1{
+  font-size:17px;
+}
+
+.logo span{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.nav button{
+  background:transparent;
+  color:var(--muted);
+  text-align:left;
+  padding:13px 14px;
+  border-radius:12px;
+  transition:.2s;
+}
+
+.nav button:hover,
+.nav button.active{
+  background:linear-gradient(90deg,rgba(108,99,255,.2),rgba(0,198,255,.06));
+  color:var(--text);
+}
+
+.nav-icon{
+  width:25px;
+  display:inline-block;
+}
+
+.side-bottom{
+  position:absolute;
+  bottom:20px;
+  left:15px;
+  right:15px;
+}
+
+.language-btn{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  color:white;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+}
+
+/* MAIN */
+.main{
+  margin-left:255px;
+  width:calc(100% - 255px);
+  padding:25px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:25px;
+}
+
+.page-title h2{
+  font-size:27px;
+}
+
+.page-title p{
+  color:var(--muted);
+  margin-top:4px;
+  font-size:13px;
+}
+
+.top-actions{
+  display:flex;
+  gap:9px;
+}
+
+.icon-btn{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  color:var(--text);
+  background:var(--panel);
+  border:1px solid var(--line);
+}
+
+/* COMMON */
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.015)),var(--panel);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+
+.grid{
+  display:grid;
+  gap:16px;
+}
+
+.stats{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.stat{
+  position:relative;
+  overflow:hidden;
+}
+
+.stat-icon{
+  font-size:25px;
+  margin-bottom:15px;
+}
+
+.stat h3{
+  font-size:27px;
+}
+
+.stat p{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
+}
+
+.stat .mini-progress{
+  margin-top:13px;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.section-head h3{
+  font-size:18px;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.btn{
+  padding:10px 14px;
+  border-radius:11px;
+  color:white;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-weight:600;
+}
+
+.btn.secondary{
+  color:var(--text);
+  background:var(--panel2);
+  border:1px solid var(--line);
+}
+
+.btn.danger{
+  background:var(--red);
+}
+
+.btn.small{
+  padding:7px 10px;
+  font-size:12px;
+}
+
+input,select,textarea{
+  width:100%;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  border-radius:11px;
+  padding:11px 12px;
+  outline:none;
+}
+
+input:focus,select:focus,textarea:focus{
+  border-color:var(--accent);
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  margin-top:15px;
+  flex-wrap:wrap;
+}
+
+.mini-progress{
+  height:8px;
+  background:var(--line);
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.mini-progress span{
+  display:block;
+  height:100%;
+  border-radius:20px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  transition:.5s;
+}
+
+.big-progress{
+  height:15px;
+}
+
+.big-progress span{
+  background:linear-gradient(90deg,var(--green),var(--accent2));
+}
+
+.badge{
+  display:inline-flex;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  background:rgba(108,99,255,.15);
+  color:#a9a4ff;
+}
+
+.badge.green{
+  color:var(--green);
+  background:rgba(37,214,149,.12);
+}
+
+.badge.orange{
+  color:var(--orange);
+  background:rgba(255,173,66,.12);
+}
+
+.badge.red{
+  color:var(--red);
+  background:rgba(255,93,115,.12);
+}
+
+/* DASHBOARD */
+.dashboard-grid{
+  grid-template-columns:1.5fr 1fr;
+  margin-top:18px;
+}
+
+.project-card{
+  cursor:pointer;
+  transition:.2s;
+}
+
+.project-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(108,99,255,.6);
+}
+
+.project-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+}
+
+.project-icon{
+  width:45px;
+  height:45px;
+  border-radius:13px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-size:23px;
+}
+
+.project-name{
+  flex:1;
+}
+
+.project-name h4{
+  font-size:16px;
+}
+
+.project-name p{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.project-percent{
+  font-size:22px;
+  font-weight:700;
+}
+
+.project-progress{
+  margin:18px 0;
+}
+
+.project-info{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.project-info div{
+  background:var(--panel2);
+  border-radius:10px;
+  padding:9px;
+}
+
+.project-info small{
+  color:var(--muted);
+  display:block;
+  font-size:10px;
+}
+
+.project-info b{
+  font-size:12px;
+}
+
+.activity{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.activity-item{
+  display:flex;
+  gap:11px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+
+.activity-item:last-child{
+  border-bottom:0;
+}
+
+.activity-dot{
+  width:9px;
+  height:9px;
+  margin-top:5px;
+  border-radius:50%;
+  background:var(--accent2);
+}
+
+.activity-item p{
+  font-size:12px;
+}
+
+.activity-item small{
+  color:var(--muted);
+}
+
+/* WORKSPACE */
+.workspace{
+  display:none;
+}
+
+.workspace.active{
+  display:block;
+}
+
+.workspace-header{
+  margin-bottom:18px;
+}
+
+.back-btn{
+  margin-bottom:14px;
+}
+
+.workspace-title{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.workspace-icon{
+  width:55px;
+  height:55px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-size:27px;
+}
+
+.workspace-title h2{
+  font-size:23px;
+}
+
+.workspace-title p{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:4px;
+}
+
+.tabs{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding-bottom:8px;
+  margin-bottom:15px;
+}
+
+.tabs button{
+  white-space:nowrap;
+  padding:10px 13px;
+  border-radius:10px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  color:var(--muted);
+}
+
+.tabs button.active{
+  color:white;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-color:transparent;
+}
+
+.tab-content{
+  display:none;
+}
+
+.tab-content.active{
+  display:block;
+}
+
+/* TIMELINE */
+.timeline{
+  position:relative;
+  padding:10px 0 10px 10px;
+}
+
+.timeline-line{
+  position:absolute;
+  left:29px;
+  top:25px;
+  bottom:25px;
+  width:3px;
+  background:var(--line);
+}
+
+.timeline-fill{
+  position:absolute;
+  left:29px;
+  top:25px;
+  width:3px;
+  background:linear-gradient(var(--green),var(--accent2));
+  transition:.5s;
+}
+
+.stage{
+  position:relative;
+  display:flex;
+  gap:18px;
+  margin-bottom:25px;
+}
+
+.stage-dot{
+  width:40px;
+  height:40px;
+  flex:none;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--panel2);
+  border:3px solid var(--line);
+  z-index:2;
+}
+
+.stage.done .stage-dot{
+  border-color:var(--green);
+  background:rgba(37,214,149,.15);
+}
+
+.stage-body{
+  flex:1;
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:15px;
+  border-radius:14px;
+}
+
+.stage-body h4{
+  margin-bottom:5px;
+}
+
+.stage-body p{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.stage-controls{
+  margin-top:12px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* TABLES */
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td{
+  text-align:left;
+  padding:12px 10px;
+  border-bottom:1px solid var(--line);
+  font-size:12px;
+}
+
+th{
+  color:var(--muted);
+  font-weight:500;
+}
+
+td b{
+  font-size:13px;
+}
+
+.check{
+  width:18px;
+  height:18px;
+  accent-color:var(--accent);
+}
+
+/* MILESTONE */
+.milestone{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  padding:13px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  border-radius:13px;
+  margin-bottom:10px;
+}
+
+.milestone-icon{
+  width:40px;
+  height:40px;
+  border-radius:11px;
+  display:grid;
+  place-items:center;
+  background:rgba(108,99,255,.14);
+}
+
+/* CALENDAR */
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:7px;
+}
+
+.cal-head{
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  padding:7px;
+}
+
+.cal-day{
+  min-height:75px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px;
+  background:var(--panel2);
+}
+
+.cal-day.today{
+  border-color:var(--accent);
+}
+
+.cal-day span{
+  font-size:11px;
+}
+
+.cal-event{
+  margin-top:7px;
+  padding:4px;
+  font-size:9px;
+  border-radius:5px;
+  background:rgba(108,99,255,.18);
+}
+
+/* BUDGET */
+.money{
+  font-size:29px;
+  font-weight:700;
+}
+
+.money-grid{
+  grid-template-columns:repeat(3,1fr);
+  margin-bottom:18px;
+}
+
+/* EMPTY */
+.empty{
+  text-align:center;
+  padding:45px 20px;
+  color:var(--muted);
+}
+
+.empty-icon{
+  font-size:42px;
+  margin-bottom:10px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  place-items:center;
+  z-index:100;
+  padding:20px;
+  backdrop-filter:blur(8px);
+}
+
+.modal.show{
+  display:grid;
+}
+
+.modal-box{
+  width:min(600px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 30px 90px rgba(0,0,0,.45);
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+
+.close{
+  width:35px;
+  height:35px;
+  border-radius:9px;
+  background:var(--panel2);
+  color:var(--text);
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  right:25px;
+  bottom:25px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:13px 17px;
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  transform:translateY(100px);
+  opacity:0;
+  transition:.3s;
+  z-index:200;
+  font-size:12px;
+}
+
+.toast.show{
+  transform:translateY(0);
+  opacity:1;
+}
+
+/* SETTINGS */
+.setting-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 0;
+  border-bottom:1px solid var(--line);
+}
+
+.setting-row:last-child{
+  border-bottom:0;
+}
+
+.setting-row h4{
+  font-size:14px;
+}
+
+.setting-row p{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+/* MOBILE */
+@media(max-width:1000px){
+  .sidebar{
+    width:75px;
+    padding:15px 9px;
+  }
+
+  .logo-text,
+  .nav-text,
+  .side-bottom{
+    display:none;
+  }
+
+  .logo{
+    justify-content:center;
+    padding:5px 0 20px;
+  }
+
+  .nav button{
+    text-align:center;
+    padding:13px 5px;
+  }
+
+  .nav-icon{
+    width:auto;
+    font-size:19px;
+  }
+
+  .main{
+    margin-left:75px;
+    width:calc(100% - 75px);
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .dashboard-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:650px){
+  .main{
+    padding:15px;
+  }
+
+  .stats,
+  .money-grid,
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .topbar{
+    align-items:flex-start;
+  }
+
+  .top-actions{
+    display:none;
+  }
+
+  .calendar{
+    min-width:600px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<aside class="sidebar">
+
+  <div class="logo">
+    <div class="logo-icon">🏗️</div>
+    <div class="logo-text">
+      <h1>Build & Buy</h1>
+      <span>Planner • تعمیر و خرید</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="active" onclick="showPage('dashboard',this)">
+      <span class="nav-icon">📊</span><span class="nav-text" data-en="Dashboard" data-ur="ڈیش بورڈ">Dashboard</span>
+    </button>
+
+    <button onclick="showPage('projects',this)">
+      <span class="nav-icon">🏠</span><span class="nav-text" data-en="Projects" data-ur="منصوبے">Projects</span>
+    </button>
+
+    <button onclick="showPage('materials',this)">
+      <span class="nav-icon">🧱</span><span class="nav-text" data-en="Materials" data-ur="سامان">Materials</span>
+    </button>
+
+    <button onclick="showPage('building',this)">
+      <span class="nav-icon">🔨</span><span class="nav-text" data-en="Building" data-ur="تعمیر">Building</span>
+    </button>
+
+    <button onclick="showPage('budget',this)">
+      <span class="nav-icon">💰</span><span class="nav-text" data-en="Budget" data-ur="بجٹ">Budget</span>
+    </button>
+
+    <button onclick="showPage('tasks',this)">
+      <span class="nav-icon">✅</span><span class="nav-text" data-en="Tasks" data-ur="کام">Tasks</span>
+    </button>
+
+    <button onclick="showPage('calendar',this)">
+      <span class="nav-icon">📅</span><span class="nav-text" data-en="Calendar" data-ur="کیلنڈر">Calendar</span>
+    </button>
+
+    <button onclick="showPage('reports',this)">
+      <span class="nav-icon">📈</span><span class="nav-text" data-en="Reports" data-ur="رپورٹس">Reports</span>
+    </button>
+
+    <button onclick="showPage('settings',this)">
+      <span class="nav-icon">⚙️</span><span class="nav-text" data-en="Settings" data-ur="ترتیبات">Settings</span>
+    </button>
+  </nav>
+
+  <div class="side-bottom">
+    <button class="language-btn" onclick="toggleLanguage()" id="languageBtn">
+      اردو
+    </button>
+  </div>
+
+</aside>
+
+<main class="main">
+
+  <div class="topbar">
+    <div class="page-title">
+      <h2 id="pageTitle">Dashboard</h2>
+      <p id="pageSubtitle">Plan what to buy, what to build and track everything.</p>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" onclick="toggleTheme()" title="Theme">🌙</button>
+      <button class="icon-btn" onclick="openProjectModal()" title="Add project">＋</button>
+    </div>
+  </div>
+
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="page">
+
+    <div class="grid stats">
+
+      <div class="card stat">
+        <div class="stat-icon">🏗️</div>
+        <h3 id="dashBuild">0%</h3>
+        <p>Build Progress / تعمیر کی پیش رفت</p>
+        <div class="mini-progress"><span id="dashBuildBar" style="width:0%"></span></div>
+      </div>
+
+      <div class="card stat">
+        <div class="stat-icon">🧱</div>
+        <h3 id="dashMaterial">0%</h3>
+        <p>Material Purchased / خریدا گیا سامان</p>
+        <div class="mini-progress"><span id="dashMaterialBar" style="width:0%"></span></div>
+      </div>
+
+      <div class="card stat">
+        <div class="stat-icon">💰</div>
+        <h3 id="dashSpent">Rs 0</h3>
+        <p>Money Spent / خرچ</p>
+      </div>
+
+      <div class="card stat">
+        <div class="stat-icon">📋</div>
+        <h3 id="dashTasks">0%</h3>
+        <p>Tasks Complete / مکمل کام</p>
+        <div class="mini-progress"><span id="dashTaskBar" style="width:0%"></span></div>
+      </div>
+
+    </div>
+
+    <div class="grid dashboard-grid">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Active Projects / فعال منصوبے</h3>
+          <button class="btn small" onclick="openProjectModal()">＋ New Project</button>
+        </div>
+        <div id="dashboardProjects"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Recent Activity / حالیہ سرگرمی</h3>
+        </div>
+        <div id="activityList" class="activity"></div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- PROJECTS -->
+  <section id="projects" class="page" style="display:none">
+    <div class="card">
+      <div class="section-head">
+        <h3>Projects / منصوبے</h3>
+        <button class="btn" onclick="openProjectModal()">＋ Create Project</button>
+      </div>
+      <div id="projectsList" class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"></div>
+    </div>
+  </section>
+
+
+  <!-- MATERIALS -->
+  <section id="materials" class="page" style="display:none">
+
+    <div class="card">
+      <div class="section-head">
+        <h3>Materials / تعمیراتی سامان</h3>
+        <button class="btn" onclick="openMaterialModal()">＋ Add Material</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Material / سامان</th>
+              <th>Required / مطلوب</th>
+              <th>Bought / خریدا</th>
+              <th>Remaining / باقی</th>
+              <th>Progress / پیش رفت</th>
+              <th>Cost / قیمت</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="materialsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- BUILDING -->
+  <section id="building" class="page" style="display:none">
+
+    <div class="card">
+      <div class="section-head">
+        <h3>Building Stages / تعمیر کے مراحل</h3>
+        <button class="btn" onclick="openStageModal()">＋ Add Stage</button>
+      </div>
+
+      <div id="timeline"></div>
+    </div>
+
+  </section>
+
+
+  <!-- BUDGET -->
+  <section id="budget" class="page" style="display:none">
+
+    <div class="grid money-grid">
+
+      <div class="card">
+        <p class="muted">Planned Budget / منصوبہ بند بجٹ</p>
+        <div class="money" id="plannedMoney">Rs 0</div>
+      </div>
+
+      <div class="card">
+        <p class="muted">Spent / خرچ شدہ</p>
+        <div class="money" id="spentMoney">Rs 0</div>
+      </div>
+
+      <div class="card">
+        <p class="muted">Remaining / باقی</p>
+        <div class="money" id="remainingMoney">Rs 0</div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h3>Budget Tracker / بجٹ ٹریکر</h3>
+        <button class="btn" onclick="openExpenseModal()">＋ Add Expense</button>
+      </div>
+
+      <div class="mini-progress big-progress">
+        <span id="budgetBar" style="width:0%"></span>
+      </div>
+
+      <br>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Description / تفصیل</th>
+              <th>Amount / رقم</th>
+              <th>Date / تاریخ</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="expenseTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- TASKS -->
+  <section id="tasks" class="page" style="display:none">
+
+    <div class="card">
+      <div class="section-head">
+        <h3>Tasks / کام</h3>
+        <button class="btn" onclick="openTaskModal()">＋ Add Task</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Done</th>
+              <th>Task / کام</th>
+              <th>Stage / مرحلہ</th>
+              <th>Priority / ترجیح</th>
+              <th>Due / آخری تاریخ</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tasksTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- CALENDAR -->
+  <section id="calendar" class="page" style="display:none">
+
+    <div class="card">
+      <div class="section-head">
+        <h3 id="calendarTitle">Calendar / کیلنڈر</h3>
+        <div>
+          <button class="btn small secondary" onclick="changeMonth(-1)">‹</button>
+          <button class="btn small secondary" onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
+
+      <div class="calendar" id="calendarGrid"></div>
+    </div>
+
+  </section>
+
+
+  <!-- REPORTS -->
+  <section id="reports" class="page" style="display:none">
+
+    <div class="grid" style="grid-template-columns:repeat(2,1fr)">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Project Report / منصوبے کی رپورٹ</h3>
+        </div>
+        <div id="reportContent"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Backup / بیک اپ</h3>
+        </div>
+
+        <p class="muted" style="font-size:12px;line-height:1.7">
+          Export your project data to a JSON file or import it later.
+          <br>
+          اپنے منصوبے کا ڈیٹا محفوظ کریں یا دوبارہ درآمد کریں۔
+        </p>
+
+        <div class="actions">
+          <button class="btn" onclick="exportData()">⬇ Export</button>
+          <button class="btn secondary" onclick="document.getElementById('importFile').click()">⬆ Import</button>
+          <input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)">
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- SETTINGS -->
+  <section id="settings" class="page" style="display:none">
+
+    <div class="card">
+
+      <div class="section-head">
+        <h3>Settings / ترتیبات</h3>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <h4>Language / زبان</h4>
+          <p>Switch between English and Urdu.</p>
+        </div>
+        <button class="btn" onclick="toggleLanguage()" id="settingsLang">اردو</button>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <h4>Theme / تھیم</h4>
+          <p>Change the appearance of the planner.</p>
+        </div>
+        <button class="btn secondary" onclick="toggleTheme()">🌙 / ☀️</button>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <h4>Save Data / ڈیٹا محفوظ کریں</h4>
+          <p>Your data is automatically saved in your browser.</p>
+        </div>
+        <span class="badge green">Auto-Save ON</span>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <h4>Reset Data / ڈیٹا ری سیٹ</h4>
+          <p>Delete all projects and start again.</p>
+        </div>
+        <button class="btn danger" onclick="resetData()">Reset</button>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- PROJECT WORKSPACE -->
+  <section id="workspace" class="workspace">
+
+    <div class="workspace-header">
+
+      <button class="btn secondary small back-btn" onclick="closeWorkspace()">
+        ← Back / واپس
+      </button>
+
+      <div class="workspace-title">
+        <div class="workspace-icon">🏠</div>
+        <div>
+          <h2 id="workspaceName">Project</h2>
+          <p id="workspaceGoal">Project goal</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tabs">
+
+      <button class="active" onclick="showTab('overview',this)">📊 Overview</button>
+      <button onclick="showTab('wTimeline',this)">📍 Timeline</button>
+      <button onclick="showTab('wTasks',this)">✅ Tasks</button>
+      <button onclick="showTab('wMaterials',this)">🧱 Materials</button>
+      <button onclick="showTab('wBudget',this)">💰 Budget</button>
+      <button onclick="showTab('wMilestones',this)">🏁 Milestones</button>
+      <button onclick="showTab('wTeam',this)">👷 Team</button>
+      <button onclick="showTab('wCalendar',this)">📅 Calendar</button>
+      <button onclick="showTab('wNotes',this)">📝 Notes</button>
+      <button onclick="showTab('wHistory',this)">🕘 History</button>
+
+    </div>
+
+
+    <!-- OVERVIEW -->
+    <div id="overview" class="tab-content active">
+
+      <div class="grid stats">
+
+        <div class="card stat">
+          <div class="stat-icon">🏗️</div>
+          <h3 id="wBuildPercent">0%</h3>
+          <p>Build Progress / تعمیر</p>
+        </div>
+
+        <div class="card stat">
+          <div class="stat-icon">🧱</div>
+          <h3 id="wMaterialPercent">0%</h3>
+          <p>Materials / سامان</p>
+        </div>
+
+        <div class="card stat">
+          <div class="stat-icon">💰</div>
+          <h3 id="wBudgetPercent">0%</h3>
+          <p>Budget Used / بجٹ</p>
+        </div>
+
+        <div class="card stat">
+          <div class="stat-icon">✅</div>
+          <h3 id="wTaskPercent">0%</h3>
+          <p>Tasks / کام</p>
+        </div>
+
+      </div>
+
+      <div class="grid dashboard-grid" style="margin-top:16px">
+
+        <div class="card">
+          <div class="section-head">
+            <h3>Overall Progress / مجموعی پیش رفت</h3>
+            <b id="overallPercent">0%</b>
+          </div>
+
+          <div class="mini-progress big-progress">
+            <span id="overallBar" style="width:0%"></span>
+          </div>
+
+          <div style="margin-top:20px" id="currentStageBox"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h3>Project Goal / منصوبے کا مقصد</h3>
+          </div>
+          <p id="goalText" class="muted" style="line-height:1.7;font-size:13px"></p>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- WORKSPACE TIMELINE -->
+    <div id="wTimeline" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Build Timeline / تعمیر کا ٹائم لائن</h3>
+          <button class="btn" onclick="openStageModal()">＋ Add Stage</button>
+        </div>
+
+        <div id="workspaceTimeline"></div>
+      </div>
+
+    </div>
+
+
+    <!-- WORKSPACE TASKS -->
+    <div id="wTasks" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Project Tasks / منصوبے کے کام</h3>
+          <button class="btn" onclick="openTaskModal()">＋ Add Task</button>
+        </div>
+
+        <div id="workspaceTasks"></div>
+      </div>
+
+    </div>
+
+
+    <!-- WORKSPACE MATERIALS -->
+    <div id="wMaterials" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Materials / سامان</h3>
+          <button class="btn" onclick="openMaterialModal()">＋ Add Material</button>
+        </div>
+
+        <div id="workspaceMaterials"></div>
+      </div>
+
+    </div>
+
+
+    <!-- WORKSPACE BUDGET -->
+    <div id="wBudget" class="tab-content">
+
+      <div class="grid money-grid">
+
+        <div class="card">
+          <p class="muted">Budget / بجٹ</p>
+          <div class="money" id="wBudgetTotal">Rs 0</div>
+        </div>
+
+        <div class="card">
+          <p class="muted">Spent / خرچ</p>
+          <div class="money" id="wBudgetSpent">Rs 0</div>
+        </div>
+
+        <div class="card">
+          <p class="muted">Remaining / باقی</p>
+          <div class="money" id="wBudgetRemaining">Rs 0</div>
+        </div>
+
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Expenses / اخراجات</h3>
+          <button class="btn" onclick="openExpenseModal()">＋ Add Expense</button>
+        </div>
+        <div id="workspaceExpenses"></div>
+      </div>
+
+    </div>
+
+
+    <!-- MILESTONES -->
+    <div id="wMilestones" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Milestones / اہم مراحل</h3>
+          <button class="btn" onclick="openMilestoneModal()">＋ Add Milestone</button>
+        </div>
+
+        <div id="milestonesList"></div>
+      </div>
+
+    </div>
+
+
+    <!-- TEAM -->
+    <div id="wTeam" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Team & Roles / ٹیم اور کردار</h3>
+          <button class="btn" onclick="openTeamModal()">＋ Add Person</button>
+        </div>
+
+        <div id="teamList"></div>
+      </div>
+
+    </div>
+
+
+    <!-- CALENDAR -->
+    <div id="wCalendar" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Project Calendar / منصوبے کا کیلنڈر</h3>
+        </div>
+        <div id="workspaceCalendar"></div>
+      </div>
+
+    </div>
+
+
+    <!-- NOTES -->
+    <div id="wNotes" class="tab-content">
+
+      <div class="card">
+
+        <div class="section-head">
+          <h3>Project Notes / منصوبے کے نوٹس</h3>
+        </div>
+
+        <textarea id="projectNotes" placeholder="Write notes... / اپنے نوٹس لکھیں..."></textarea>
+
+        <div class="actions">
+          <button class="btn" onclick="saveNotes()">Save Notes / نوٹس محفوظ کریں</button>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- HISTORY -->
+    <div id="wHistory" class="tab-content">
+
+      <div class="card">
+        <div class="section-head">
+          <h3>Activity History / سرگرمی کی تاریخ</h3>
+        </div>
+        <div id="workspaceHistory"></div>
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+</div>
+
+
+<!-- PROJECT MODAL -->
+<div class="modal" id="projectModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Create Project / منصوبہ بنائیں</h3>
+      <button class="close" onclick="closeModal('projectModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div>
+        <label>Project Name / منصوبے کا نام</label>
+        <input id="projectNameInput" placeholder="e.g. My House">
+      </div>
+
+      <div>
+        <label>Icon</label>
+        <select id="projectIconInput">
+          <option>🏠</option>
+          <option>🏢</option>
+          <option>🏭</option>
+          <option>🏪</option>
+          <option>🕌</option>
+          <option>🏗️</option>
+        </select>
+      </div>
+
+      <div class="full">
+        <label>Goal / مقصد</label>
+        <textarea id="projectGoalInput" placeholder="What are you planning to build?"></textarea>
+      </div>
+
+      <div>
+        <label>Budget / بجٹ</label>
+        <input id="projectBudgetInput" type="number" min="0" placeholder="5000000">
+      </div>
+
+      <div>
+        <label>Deadline / آخری تاریخ</label>
+        <input id="projectDeadlineInput" type="date">
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('projectModal')">Cancel</button>
+      <button class="btn" onclick="createProject()">Create Project</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- MATERIAL MODAL -->
+<div class="modal" id="materialModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Add Material / سامان شامل کریں</h3>
+      <button class="close" onclick="closeModal('materialModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div>
+        <label>Material / سامان</label>
+        <input id="materialName" placeholder="Cement">
+      </div>
+
+      <div>
+        <label>Unit / اکائی</label>
+        <input id="materialUnit" placeholder="bags">
+      </div>
+
+      <div>
+        <label>Required Quantity / مطلوب مقدار</label>
+        <input id="materialRequired" type="number" min="0">
+      </div>
+
+      <div>
+        <label>Already Bought / پہلے سے خریدا</label>
+        <input id="materialBought" type="number" min="0" value="0">
+      </div>
+
+      <div class="full">
+        <label>Estimated Total Cost / اندازاً کل قیمت</label>
+        <input id="materialCost" type="number" min="0" value="0">
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('materialModal')">Cancel</button>
+      <button class="btn" onclick="createMaterial()">Add Material</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- STAGE MODAL -->
+<div class="modal" id="stageModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Add Building Stage / تعمیر کا مرحلہ</h3>
+      <button class="close" onclick="closeModal('stageModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div>
+        <label>Stage Name / مرحلے کا نام</label>
+        <input id="stageName" placeholder="Foundation">
+      </div>
+
+      <div>
+        <label>Start Date / شروع</label>
+        <input id="stageStart" type="date">
+      </div>
+
+      <div>
+        <label>End Date / اختتام</label>
+        <input id="stageEnd" type="date">
+      </div>
+
+      <div>
+        <label>Progress % / پیش رفت</label>
+        <input id="stageProgress" type="number" min="0" max="100" value="0">
+      </div>
+
+      <div class="full">
+        <label>Description / تفصیل</label>
+        <textarea id="stageDescription" placeholder="What happens in this stage?"></textarea>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('stageModal')">Cancel</button>
+      <button class="btn" onclick="createStage()">Add Stage</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- TASK MODAL -->
+<div class="modal" id="taskModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Add Task / کام شامل کریں</h3>
+      <button class="close" onclick="closeModal('taskModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="full">
+        <label>Task / کام</label>
+        <input id="taskName" placeholder="Buy cement">
+      </div>
+
+      <div>
+        <label>Stage / مرحلہ</label>
+        <select id="taskStage"></select>
+      </div>
+
+      <div>
+        <label>Priority / ترجیح</label>
+        <select id="taskPriority">
+          <option value="Low">Low / کم</option>
+          <option value="Medium" selected>Medium / درمیانی</option>
+          <option value="High">High / زیادہ</option>
+          <option value="Critical">Critical / انتہائی اہم</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Due Date / آخری تاریخ</label>
+        <input id="taskDue" type="date">
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('taskModal')">Cancel</button>
+      <button class="btn" onclick="createTask()">Add Task</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- EXPENSE MODAL -->
+<div class="modal" id="expenseModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Add Expense / خرچ شامل کریں</h3>
+      <button class="close" onclick="closeModal('expenseModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="full">
+        <label>Description / تفصیل</label>
+        <input id="expenseName" placeholder="Bought cement">
+      </div>
+
+      <div>
+        <label>Amount / رقم</label>
+        <input id="expenseAmount" type="number" min="0">
+      </div>
+
+      <div>
+        <label>Date / تاریخ</label>
+        <input id="expenseDate" type="date">
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('expenseModal')">Cancel</button>
+      <button class="btn" onclick="createExpense()">Add Expense</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- MILESTONE MODAL -->
+<div class="modal" id="milestoneModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Add Milestone / اہم مرحلہ</h3>
+      <button class="close" onclick="closeModal('milestoneModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="full">
+        <label>Milestone / اہم مرحلہ</label>
+        <input id="milestoneName" placeholder="Foundation Complete">
+      </div>
+
+      <div>
+        <label>Date / تاریخ</label>
+        <input id="milestoneDate" type="date">
+      </div>
+
+      <div>
+        <label>Icon</label>
+        <select id="milestoneIcon">
+          <option>🏁</option>
+          <option>🎯</option>
+          <option>⭐</option>
+          <option>🏆</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('milestoneModal')">Cancel</button>
+      <button class="btn" onclick="createMilestone()">Add Milestone</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- TEAM MODAL -->
+<div class="modal" id="teamModal">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <h3>Add Team Member / ٹیم ممبر</h3>
+      <button class="close" onclick="closeModal('teamModal')">×</button>
+    </div>
+
+    <div class="form-grid">
+
+      <div>
+        <label>Name / نام</label>
+        <input id="teamName" placeholder="Ahmed">
+      </div>
+
+      <div>
+        <label>Role / کردار</label>
+        <input id="teamRole" placeholder="Mason">
+      </div>
+
+      <div class="full">
+        <label>Phone / رابطہ</label>
+        <input id="teamPhone" placeholder="Optional">
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" onclick="closeModal('teamModal')">Cancel</button>
+      <button class="btn" onclick="createTeam()">Add Person</button>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+/* =========================================================
+   BUILD & BUY PLANNER
+   Complete standalone application
+   ========================================================= */
+
+const STORAGE_KEY = "buildBuyPlannerData";
+
+let state = {
+  projects: [],
+  activities: [],
+  theme: "dark",
+  language: "en"
+};
+
+let currentProjectId = null;
+let currentCalendarDate = new Date();
+
+/* ---------- STARTUP ---------- */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  loadData();
+
+  if(state.projects.length === 0){
+    createDemoProject();
+  }
+
+  applyTheme();
+  applyLanguage();
+  refreshAll();
+
+});
+
+/* ---------- STORAGE ---------- */
+
+function saveData(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+}
+
+function loadData(){
+  try{
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if(saved){
+      const parsed = JSON.parse(saved);
+
+      state = {
+        projects: Array.isArray(parsed.projects) ? parsed.projects : [],
+        activities: Array.isArray(parsed.activities) ? parsed.activities : [],
+        theme: parsed.theme || "dark",
+        language: parsed.language || "en"
+      };
+    }
+  }catch(error){
+    console.error("Could not load saved data:",error);
+  }
+}
+
+/* ---------- DEMO PROJECT ---------- */
+
+function createDemoProject(){
+
+  const id = uid();
+
+  state.projects.push({
+    id,
+    name:"My House",
+    icon:"🏠",
+    goal:"Build and complete my house while tracking materials, purchases, tasks and budget.",
+    budget:5000000,
+    deadline:"",
+    notes:"",
+    stages:[
+      {
+        id:uid(),
+        name:"Foundation",
+        start:"",
+        end:"",
+        progress:100,
+        description:"Foundation work."
+      },
+      {
+        id:uid(),
+        name:"Walls",
+        start:"",
+        end:"",
+        progress:65,
+        description:"Building the main walls."
+      },
+      {
+        id:uid(),
+        name:"Roof",
+        start:"",
+        end:"",
+        progress:20,
+        description:"Roof construction."
+      },
+      {
+        id:uid(),
+        name:"Finishing",
+        start:"",
+        end:"",
+        progress:0,
+        description:"Paint, flooring and final work."
+      }
+    ],
+    materials:[
+      {
+        id:uid(),
+        name:"Cement",
+        unit:"bags",
+        required:100,
+        bought:70,
+        cost:150000
+      },
+      {
+        id:uid(),
+        name:"Bricks",
+        unit:"pieces",
+        required:10000,
+        bought:8000,
+        cost:180000
+      },
+      {
+        id:uid(),
+        name:"Steel",
+        unit:"tons",
+        required:2,
+        bought:1.2,
+        cost:300000
+      }
+    ],
+    tasks:[
+      {
+        id:uid(),
+        name:"Check foundation",
+        stage:"",
+        priority:"High",
+        due:"",
+        done:true
+      },
+      {
+        id:uid(),
+        name:"Buy remaining cement",
+        stage:"",
+        priority:"Medium",
+        due:"",
+        done:false
+      },
+      {
+        id:uid(),
+        name:"Continue wall construction",
+        stage:"",
+        priority:"High",
+        due:"",
+        done:false
+      }
+    ],
+    expenses:[
+      {
+        id:uid(),
+        name:"Cement purchase",
+        amount:100000,
+        date:today()
+      }
+    ],
+    milestones:[
+      {
+        id:uid(),
+        name:"Foundation Complete",
+        date:"",
+        icon:"🏁",
+        done:true
+      }
+    ],
+    team:[
+      {
+        id:uid(),
+        name:"Main Worker",
+        role:"Mason",
+        phone:""
+      }
+    ],
+    history:[
+      {
+        text:"Demo project created.",
+        date:new Date().toLocaleString()
+      }
+    ]
+  });
+
+  addActivity("Created demo project: My House");
+  saveData();
+}
+
+/* ---------- HELPERS ---------- */
+
+function uid(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function today(){
+  return new Date().toISOString().split("T")[0];
+}
+
+function currentProject(){
+  return state.projects.find(p => p.id === currentProjectId);
+}
+
+function clamp(value,min=0,max=100){
+  return Math.max(min,Math.min(max,Number(value)||0));
+}
+
+function money(value){
+  return "Rs " + Number(value || 0).toLocaleString("en-PK");
+}
+
+function esc(value){
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function addActivity(text){
+
+  state.activities.unshift({
+    text,
+    date:new Date().toLocaleString()
+  });
+
+  state.activities = state.activities.slice(0,30);
+
+  saveData();
+}
+
+function addProjectHistory(project,text){
+
+  if(!project.history){
+    project.history=[];
+  }
+
+  project.history.unshift({
+    text,
+    date:new Date().toLocaleString()
+  });
+
+  project.history = project.history.slice(0,50);
+
+  addActivity(project.name + ": " + text);
+}
+
+/* ---------- CALCULATIONS ---------- */
+
+function buildProgress(project){
+
+  if(!project.stages || project.stages.length === 0) return 0;
+
+  return Math.round(
+    project.stages.reduce((sum,s)=>sum + clamp(s.progress),0)
+    / project.stages.length
+  );
+}
+
+function materialProgress(project){
+
+  if(!project.materials || project.materials.length === 0) return 0;
+
+  let required=0;
+  let bought=0;
+
+  project.materials.forEach(m=>{
+    required += Number(m.required)||0;
+    bought += Math.min(Number(m.bought)||0,Number(m.required)||0);
+  });
+
+  if(required===0) return 0;
+
+  return Math.round((bought/required)*100);
+}
+
+function taskProgress(project){
+
+  if(!project.tasks || project.tasks.length===0) return 0;
+
+  const done=project.tasks.filter(t=>t.done).length;
+
+  return Math.round(done/project.tasks.length*100);
+}
+
+function budgetSpent(project){
+
+  return (project.expenses||[]).reduce(
+    (sum,e)=>sum+(Number(e.amount)||0),0
+  );
+}
+
+function budgetProgress(project){
+
+  if(!project.budget) return 0;
+
+  return Math.min(
+    100,
+    Math.round(budgetSpent(project)/Number(project.budget)*100)
+  );
+}
+
+function overallProgress(project){
+
+  return Math.round(
+    (
+      buildProgress(project) +
+      materialProgress(project) +
+      taskProgress(project)
+    ) / 3
+  );
+}
+
+function remainingMaterial(m){
+  return Math.max(0,(Number(m.required)||0)-(Number(m.bought)||0));
+}
+
+/* ---------- NAVIGATION ---------- */
+
+function showPage(page,button){
+
+  document.querySelectorAll(".page").forEach(p=>{
+    p.style.display="none";
+  });
+
+  document.getElementById("workspace").classList.remove("active");
+
+  const target=document.getElementById(page);
+
+  if(target){
+    target.style.display="block";
+  }
+
+  document.querySelectorAll(".nav button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  const titles={
+    dashboard:["Dashboard","Plan what to buy, what to build and track everything."],
+    projects:["Projects","Manage your building projects."],
+    materials:["Materials","Track required and purchased materials."],
+    building:["Building","Track every building stage."],
+    budget:["Budget","Monitor spending and remaining budget."],
+    tasks:["Tasks","Manage construction tasks."],
+    calendar:["Calendar","See project dates and deadlines."],
+    reports:["Reports","View project statistics and backups."],
+    settings:["Settings","Customize your planner."]
+  };
+
+  if(titles[page]){
+    document.getElementById("pageTitle").textContent=titles[page][0];
+    document.getElementById("pageSubtitle").textContent=titles[page][1];
+  }
+
+  refreshAll();
+}
+
+function closeWorkspace(){
+
+  document.getElementById("workspace").classList.remove("active");
+  document.getElementById("dashboard").style.display="block";
+
+  document.querySelectorAll(".page").forEach(p=>{
+    if(p.id!=="dashboard") p.style.display="none";
+  });
+
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+
+  const first=document.querySelector(".nav button");
+  if(first) first.classList.add("active");
+
+  document.getElementById("pageTitle").textContent="Dashboard";
+  document.getElementById("pageSubtitle").textContent="Plan what to buy, what to build and track everything.";
+
+  currentProjectId=null;
+
+  refreshAll();
+}
+
+function openWorkspace(id){
+
+  const project=state.projects.find(p=>p.id===id);
+
+  if(!project) return;
+
+  currentProjectId=id;
+
+  document.querySelectorAll(".page").forEach(p=>{
+    p.style.display="none";
+  });
+
+  document.getElementById("workspace").classList.add("active");
+
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+
+  renderWorkspace();
+
+}
+
+/* ---------- TABS ---------- */
+
+function showTab(tab,button){
+
+  document.querySelectorAll(".tab-content").forEach(t=>{
+    t.classList.remove("active");
+  });
+
+  const target=document.getElementById(tab);
+
+  if(target) target.classList.add("active");
+
+  document.querySelectorAll(".tabs button").forEach(b=>{
+    b.classList.remove("active");
+  });
+
+  if(button) button.classList.add("active");
+
+  renderWorkspace();
+}
+
+/* ---------- PROJECT MODAL ---------- */
+
+function openProjectModal(){
+
+  document.getElementById("projectNameInput").value="";
+  document.getElementById("projectGoalInput").value="";
+  document.getElementById("projectBudgetInput").value="";
+  document.getElementById("projectDeadlineInput").value="";
+
+  openModal("projectModal");
+}
+
+function createProject(){
+
+  const name=document.getElementById("projectNameInput").value.trim();
+
+  if(!name){
+    toast("Please enter a project name.");
+    return;
+  }
+
+  const project={
+    id:uid(),
+    name,
+    icon:document.getElementById("projectIconInput").value,
+    goal:document.getElementById("projectGoalInput").value.trim(),
+    budget:Number(document.getElementById("projectBudgetInput").value)||0,
+    deadline:document.getElementById("projectDeadlineInput").value,
+    notes:"",
+    stages:[],
+    materials:[],
+    tasks:[],
+    expenses:[],
+    milestones:[],
+    team:[],
+    history:[]
+  };
+
+  state.projects.push(project);
+
+  addProjectHistory(project,"Project created.");
+
+  saveData();
+
+  closeModal("projectModal");
+
+  toast("Project created successfully!");
+
+  openWorkspace(project.id);
+}
+
+/* ---------- MATERIALS ---------- */
+
+function openMaterialModal(){
+
+  if(!currentProject()){
+    toast("Open a project first.");
+    return;
+  }
+
+  document.getElementById("materialName").value="";
+  document.getElementById("materialUnit").value="";
+  document.getElementById("materialRequired").value="";
+  document.getElementById("materialBought").value="0";
+  document.getElementById("materialCost").value="0";
+
+  openModal("materialModal");
+}
+
+function createMaterial(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const name=document.getElementById("materialName").value.trim();
+
+  if(!name){
+    toast("Enter a material name.");
+    return;
+  }
+
+  const required=Number(document.getElementById("materialRequired").value)||0;
+  const bought=Math.max(0,Number(document.getElementById("materialBought").value)||0);
+
+  project.materials.push({
+    id:uid(),
+    name,
+    unit:document.getElementById("materialUnit").value.trim() || "units",
+    required,
+    bought:Math.min(bought,required || bought),
+    cost:Number(document.getElementById("materialCost").value)||0
+  });
+
+  addProjectHistory(project,"Added material: "+name);
+
+  saveData();
+  closeModal("materialModal");
+  toast("Material added!");
+  refreshAll();
+}
+
+/* ---------- MATERIAL BUY ---------- */
+
+function buyMaterial(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const m=project.materials.find(x=>x.id===id);
+
+  if(!m) return;
+
+  const remaining=remainingMaterial(m);
+
+  if(remaining<=0){
+    toast("This material is already fully purchased.");
+    return;
+  }
+
+  const amount=prompt(
+    "How much did you buy?\nکتنی مقدار خریدی؟",
+    remaining
+  );
+
+  if(amount===null) return;
+
+  const qty=Number(amount);
+
+  if(!Number.isFinite(qty) || qty<=0){
+    toast("Enter a valid quantity.");
+    return;
+  }
+
+  m.bought=Math.min(
+    Number(m.required)||0,
+    Number(m.bought||0)+qty
+  );
+
+  addProjectHistory(
+    project,
+    "Purchased "+qty+" "+m.unit+" of "+m.name
+  );
+
+  saveData();
+  toast("Purchase recorded!");
+  refreshAll();
+}
+
+/* ---------- DELETE MATERIAL ---------- */
+
+function deleteMaterial(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  if(!confirm("Delete this material?")) return;
+
+  project.materials=project.materials.filter(m=>m.id!==id);
+
+  addProjectHistory(project,"Deleted a material.");
+
+  saveData();
+  refreshAll();
+}
+
+/* ---------- STAGES ---------- */
+
+function openStageModal(){
+
+  if(!currentProject()){
+    toast("Open a project first.");
+    return;
+  }
+
+  document.getElementById("stageName").value="";
+  document.getElementById("stageStart").value="";
+  document.getElementById("stageEnd").value="";
+  document.getElementById("stageProgress").value="0";
+  document.getElementById("stageDescription").value="";
+
+  openModal("stageModal");
+}
+
+function createStage(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const name=document.getElementById("stageName").value.trim();
+
+  if(!name){
+    toast("Enter a stage name.");
+    return;
+  }
+
+  const stage={
+    id:uid(),
+    name,
+    start:document.getElementById("stageStart").value,
+    end:document.getElementById("stageEnd").value,
+    progress:clamp(document.getElementById("stageProgress").value),
+    description:document.getElementById("stageDescription").value.trim()
+  };
+
+  project.stages.push(stage);
+
+  addProjectHistory(project,"Added stage: "+name);
+
+  saveData();
+  closeModal("stageModal");
+  toast("Stage added!");
+  refreshAll();
+}
+
+function updateStageProgress(id,value){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const stage=project.stages.find(s=>s.id===id);
+
+  if(!stage) return;
+
+  stage.progress=clamp(value);
+
+  addProjectHistory(
+    project,
+    stage.name+" progress changed to "+stage.progress+"%"
+  );
+
+  saveData();
+  refreshAll();
+}
+
+function deleteStage(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  if(!confirm("Delete this stage?")) return;
+
+  project.stages=project.stages.filter(s=>s.id!==id);
+
+  saveData();
+  refreshAll();
+}
+
+/* ---------- TASKS ---------- */
+
+function openTaskModal(){
+
+  const project=currentProject();
+
+  if(!project){
+    toast("Open a project first.");
+    return;
+  }
+
+  const select=document.getElementById("taskStage");
+
+  select.innerHTML=
+    `<option value="">General / عمومی</option>`+
+    project.stages.map(s=>
+      `<option value="${esc(s.id)}">${esc(s.name)}</option>`
+    ).join("");
+
+  document.getElementById("taskName").value="";
+  document.getElementById("taskPriority").value="Medium";
+  document.getElementById("taskDue").value="";
+
+  openModal("taskModal");
+}
+
+function createTask(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const name=document.getElementById("taskName").value.trim();
+
+  if(!name){
+    toast("Enter a task.");
+    return;
+  }
+
+  project.tasks.push({
+    id:uid(),
+    name,
+    stage:document.getElementById("taskStage").value,
+    priority:document.getElementById("taskPriority").value,
+    due:document.getElementById("taskDue").value,
+    done:false
+  });
+
+  addProjectHistory(project,"Added task: "+name);
+
+  saveData();
+  closeModal("taskModal");
+  toast("Task added!");
+  refreshAll();
+}
+
+function toggleTask(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const task=project.tasks.find(t=>t.id===id);
+
+  if(!task) return;
+
+  task.done=!task.done;
+
+  addProjectHistory(
+    project,
+    (task.done?"Completed task: ":"Reopened task: ")+task.name
+  );
+
+  saveData();
+  refreshAll();
+}
+
+function deleteTask(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  project.tasks=project.tasks.filter(t=>t.id!==id);
+
+  saveData();
+  refreshAll();
+}
+
+/* ---------- EXPENSES ---------- */
+
+function openExpenseModal(){
+
+  if(!currentProject()){
+    toast("Open a project first.");
+    return;
+  }
+
+  document.getElementById("expenseName").value="";
+  document.getElementById("expenseAmount").value="";
+  document.getElementById("expenseDate").value=today();
+
+  openModal("expenseModal");
+}
+
+function createExpense(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const name=document.getElementById("expenseName").value.trim();
+  const amount=Number(document.getElementById("expenseAmount").value)||0;
+
+  if(!name || amount<=0){
+    toast("Enter description and valid amount.");
+    return;
+  }
+
+  project.expenses.push({
+    id:uid(),
+    name,
+    amount,
+    date:document.getElementById("expenseDate").value || today()
+  });
+
+  addProjectHistory(
+    project,
+    "Added expense: "+money(amount)+" — "+name
+  );
+
+  saveData();
+  closeModal("expenseModal");
+  toast("Expense added!");
+  refreshAll();
+}
+
+function deleteExpense(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  project.expenses=project.expenses.filter(e=>e.id!==id);
+
+  saveData();
+  refreshAll();
+}
+
+/* ---------- MILESTONES ---------- */
+
+function openMilestoneModal(){
+
+  if(!currentProject()){
+    toast("Open a project first.");
+    return;
+  }
+
+  document.getElementById("milestoneName").value="";
+  document.getElementById("milestoneDate").value="";
+  document.getElementById("milestoneIcon").value="🏁";
+
+  openModal("milestoneModal");
+}
+
+function createMilestone(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const name=document.getElementById("milestoneName").value.trim();
+
+  if(!name){
+    toast("Enter a milestone.");
+    return;
+  }
+
+  project.milestones.push({
+    id:uid(),
+    name,
+    date:document.getElementById("milestoneDate").value,
+    icon:document.getElementById("milestoneIcon").value,
+    done:false
+  });
+
+  addProjectHistory(project,"Added milestone: "+name);
+
+  saveData();
+  closeModal("milestoneModal");
+  toast("Milestone added!");
+  refreshAll();
+}
+
+function toggleMilestone(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const m=project.milestones.find(x=>x.id===id);
+
+  if(!m) return;
+
+  m.done=!m.done;
+
+  saveData();
+  refreshAll();
+}
+
+function deleteMilestone(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  project.milestones=project.milestones.filter(m=>m.id!==id);
+
+  saveData();
+  refreshAll();
+}
+
+/* ---------- TEAM ---------- */
+
+function openTeamModal(){
+
+  if(!currentProject()){
+    toast("Open a project first.");
+    return;
+  }
+
+  document.getElementById("teamName").value="";
+  document.getElementById("teamRole").value="";
+  document.getElementById("teamPhone").value="";
+
+  openModal("teamModal");
+}
+
+function createTeam(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  const name=document.getElementById("teamName").value.trim();
+
+  if(!name){
+    toast("Enter a name.");
+    return;
+  }
+
+  project.team.push({
+    id:uid(),
+    name,
+    role:document.getElementById("teamRole").value.trim() || "Team Member",
+    phone:document.getElementById("teamPhone").value.trim()
+  });
+
+  addProjectHistory(project,"Added team member: "+name);
+
+  saveData();
+  closeModal("teamModal");
+  toast("Team member added!");
+  refreshAll();
+}
+
+function deleteTeam(id){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  project.team=project.team.filter(t=>t.id!==id);
+
+  saveData();
+  refreshAll();
+}
+
+/* ---------- NOTES ---------- */
+
+function saveNotes(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  project.notes=document.getElementById("projectNotes").value;
+
+  addProjectHistory(project,"Updated project notes.");
+
+  saveData();
+
+  toast("Notes saved!");
+}
+
+/* ---------- RENDER DASHBOARD ---------- */
+
+function refreshAll(){
+
+  renderDashboard();
+  renderProjects();
+  renderGlobalMaterials();
+  renderGlobalBuilding();
+  renderGlobalBudget();
+  renderGlobalTasks();
+  renderGlobalCalendar();
+  renderReports();
+  renderWorkspace();
+
+}
+
+function renderDashboard(){
+
+  let build=0;
+  let mat=0;
+  let task=0;
+  let spent=0;
+
+  if(state.projects.length){
+
+    build=Math.round(
+      state.projects.reduce((a,p)=>a+buildProgress(p),0)
+      /state.projects.length
+    );
+
+    mat=Math.round(
+      state.projects.reduce((a,p)=>a+materialProgress(p),0)
+      /state.projects.length
+    );
+
+    task=Math.round(
+      state.projects.reduce((a,p)=>a+taskProgress(p),0)
+      /state.projects.length
+    );
+
+    spent=state.projects.reduce((a,p)=>a+budgetSpent(p),0);
+  }
+
+  document.getElementById("dashBuild").textContent=build+"%";
+  document.getElementById("dashBuildBar").style.width=build+"%";
+
+  document.getElementById("dashMaterial").textContent=mat+"%";
+  document.getElementById("dashMaterialBar").style.width=mat+"%";
+
+  document.getElementById("dashSpent").textContent=money(spent);
+
+  document.getElementById("dashTasks").textContent=task+"%";
+  document.getElementById("dashTaskBar").style.width=task+"%";
+
+  const box=document.getElementById("dashboardProjects");
+
+  if(state.projects.length===0){
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">🏗️</div>
+        <p>No projects yet.</p>
+      </div>`;
+  }else{
+
+    box.innerHTML=state.projects.slice(0,6).map(projectCard).join("");
+  }
+
+  const activity=document.getElementById("activityList");
+
+  if(!state.activities.length){
+
+    activity.innerHTML=`
+      <div class="empty">
+        No activity yet.
+      </div>`;
+
+  }else{
+
+    activity.innerHTML=state.activities.slice(0,8).map(a=>`
+      <div class="activity-item">
+        <div class="activity-dot"></div>
+        <div>
+          <p>${esc(a.text)}</p>
+          <small>${esc(a.date)}</small>
+        </div>
+      </div>
+    `).join("");
+  }
+}
+
+function projectCard(project){
+
+  const progress=overallProgress(project);
+
+  return `
+    <div class="card project-card" onclick="openWorkspace('${project.id}')">
+
+      <div class="project-top">
+
+        <div class="project-icon">${esc(project.icon)}</div>
+
+        <div class="project-name">
+          <h4>${esc(project.name)}</h4>
+          <p>${esc(project.goal || "No goal added.")}</p>
+        </div>
+
+        <div class="project-percent">${progress}%</div>
+
+      </div>
+
+      <div class="project-progress">
+        <div class="mini-progress">
+          <span style="width:${progress}%"></span>
+        </div>
+      </div>
+
+      <div class="project-info">
+
+        <div>
+          <small>Build</small>
+          <b>${buildProgress(project)}%</b>
+        </div>
+
+        <div>
+          <small>Materials</small>
+          <b>${materialProgress(project)}%</b>
+        </div>
+
+        <div>
+          <small>Tasks</small>
+          <b>${taskProgress(project)}%</b>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+/* ---------- PROJECTS PAGE ---------- */
+
+function renderProjects(){
+
+  const box=document.getElementById("projectsList");
+
+  if(!box) return;
+
+  if(!state.projects.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">🏠</div>
+        <p>Create your first project.</p>
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=state.projects.map(project=>`
+
+    <div class="card project-card">
+
+      <div class="project-top">
+
+        <div class="project-icon">${esc(project.icon)}</div>
+
+        <div class="project-name">
+          <h4>${esc(project.name)}</h4>
+          <p>${esc(project.goal || "No goal.")}</p>
+        </div>
+
+        <div class="project-percent">${overallProgress(project)}%</div>
+
+      </div>
+
+      <div class="project-progress">
+        <div class="mini-progress">
+          <span style="width:${overallProgress(project)}%"></span>
+        </div>
+      </div>
+
+      <div class="actions">
+
+        <button class="btn small" onclick="openWorkspace('${project.id}')">
+          Open / کھولیں
+        </button>
+
+        <button class="btn small danger" onclick="deleteProject('${project.id}')">
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  `).join("");
+}
+
+function deleteProject(id){
+
+  const project=state.projects.find(p=>p.id===id);
+
+  if(!project) return;
+
+  if(!confirm("Delete "+project.name+"?")) return;
+
+  state.projects=state.projects.filter(p=>p.id!==id);
+
+  if(currentProjectId===id){
+    currentProjectId=null;
+  }
+
+  addActivity("Deleted project: "+project.name);
+
+  saveData();
+  refreshAll();
+
+  toast("Project deleted.");
+}
+
+/* ---------- GLOBAL MATERIALS ---------- */
+
+function renderGlobalMaterials(){
+
+  const body=document.getElementById("materialsTable");
+
+  if(!body) return;
+
+  const rows=[];
+
+  state.projects.forEach(project=>{
+
+    project.materials.forEach(m=>{
+
+      const remaining=remainingMaterial(m);
+      const progress=m.required
+        ? Math.min(100,Math.round(m.bought/m.required*100))
+        : 0;
+
+      rows.push(`
+        <tr>
+
+          <td>
+            <b>${esc(m.name)}</b>
+            <br>
+            <small class="muted">${esc(project.name)}</small>
+          </td>
+
+          <td>${m.required} ${esc(m.unit)}</td>
+
+          <td>${m.bought} ${esc(m.unit)}</td>
+
+          <td>
+            <span class="${remaining===0?'badge green':'badge orange'}">
+              ${remaining} ${esc(m.unit)}
+            </span>
+          </td>
+
+          <td style="min-width:120px">
+            <div class="mini-progress">
+              <span style="width:${progress}%"></span>
+            </div>
+            <small>${progress}%</small>
+          </td>
+
+          <td>${money(m.cost)}</td>
+
+          <td>
+            <button class="btn small" onclick="openWorkspace('${project.id}');setTimeout(()=>showTab('wMaterials',document.querySelectorAll('.tabs button')[3]),50)">
+              Open
+            </button>
+          </td>
+
+        </tr>
+      `);
+    });
+
+  });
+
+  body.innerHTML=rows.length
+    ? rows.join("")
+    : `<tr><td colspan="7" class="empty">No materials added.</td></tr>`;
+}
+
+/* ---------- GLOBAL BUILDING ---------- */
+
+function renderGlobalBuilding(){
+
+  const box=document.getElementById("timeline");
+
+  if(!box) return;
+
+  if(!currentProject()){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">🏗️</div>
+        <p>Open a project to manage its building timeline.</p>
+      </div>`;
+
+    return;
+  }
+
+  renderTimelineInto(box,currentProject());
+}
+
+/* ---------- TIMELINE ---------- */
+
+function renderTimelineInto(box,project){
+
+  if(!project.stages.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">📍</div>
+        <p>No building stages yet.</p>
+      </div>`;
+
+    return;
+  }
+
+  const avg=buildProgress(project);
+
+  box.innerHTML=`
+
+    <div style="margin-bottom:22px">
+
+      <div class="section-head">
+        <h3>Build Progress / تعمیر کی پیش رفت</h3>
+        <b>${avg}%</b>
+      </div>
+
+      <div class="mini-progress big-progress">
+        <span style="width:${avg}%"></span>
+      </div>
+
+    </div>
+
+    <div class="timeline">
+
+      <div class="timeline-line"></div>
+
+      <div class="timeline-fill"
+        style="height:calc(${avg}% - 0px)">
+      </div>
+
+      ${project.stages.map((stage,index)=>`
+
+        <div class="stage ${stage.progress>=100?'done':''}">
+
+          <div class="stage-dot">
+            ${stage.progress>=100 ? "✓" : index+1}
+          </div>
+
+          <div class="stage-body">
+
+            <div class="section-head" style="margin-bottom:5px">
+              <h4>${esc(stage.name)}</h4>
+              <span class="badge">${stage.progress}%</span>
+            </div>
+
+            <p>${esc(stage.description || "No description.")}</p>
+
+            <div class="stage-controls">
+
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value="${stage.progress}"
+                style="flex:1"
+                onchange="updateStageProgress('${stage.id}',this.value)"
+              >
+
+              <button
+                class="btn small danger"
+                onclick="deleteStage('${stage.id}')">
+                ×
+              </button>
+
+            </div>
+
+            <div style="display:flex;justify-content:space-between;margin-top:9px;font-size:10px">
+              <span class="muted">${stage.start || "No start date"}</span>
+              <span class="muted">${stage.end || "No end date"}</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      `).join("")}
+
+    </div>
+  `;
+}
+
+/* ---------- GLOBAL BUDGET ---------- */
+
+function renderGlobalBudget(){
+
+  const project=currentProject();
+
+  if(!project){
+
+    document.getElementById("plannedMoney").textContent="Rs 0";
+    document.getElementById("spentMoney").textContent="Rs 0";
+    document.getElementById("remainingMoney").textContent="Rs 0";
+    document.getElementById("budgetBar").style.width="0%";
+    document.getElementById("expenseTable").innerHTML=
+      `<tr><td colspan="4" class="empty">Open a project to manage its budget.</td></tr>`;
+
+    return;
+  }
+
+  const spent=budgetSpent(project);
+  const remaining=Math.max(0,(Number(project.budget)||0)-spent);
+  const progress=budgetProgress(project);
+
+  document.getElementById("plannedMoney").textContent=money(project.budget);
+  document.getElementById("spentMoney").textContent=money(spent);
+  document.getElementById("remainingMoney").textContent=money(remaining);
+  document.getElementById("budgetBar").style.width=progress+"%";
+
+  document.getElementById("expenseTable").innerHTML=
+    project.expenses.length
+      ? project.expenses.map(e=>`
+        <tr>
+          <td>${esc(e.name)}</td>
+          <td>${money(e.amount)}</td>
+          <td>${esc(e.date)}</td>
+          <td>
+            <button class="btn small danger" onclick="deleteExpense('${e.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join("")
+      : `<tr><td colspan="4" class="empty">No expenses yet.</td></tr>`;
+}
+
+/* ---------- GLOBAL TASKS ---------- */
+
+function renderGlobalTasks(){
+
+  const body=document.getElementById("tasksTable");
+
+  if(!body) return;
+
+  const project=currentProject();
+
+  if(!project){
+
+    body.innerHTML=
+      `<tr><td colspan="6" class="empty">Open a project to manage tasks.</td></tr>`;
+
+    return;
+  }
+
+  body.innerHTML=project.tasks.length
+    ? project.tasks.map(task=>`
+
+      <tr>
+
+        <td>
+          <input
+            class="check"
+            type="checkbox"
+            ${task.done?"checked":""}
+            onchange="toggleTask('${task.id}')"
+          >
+        </td>
+
+        <td>
+          <b style="${task.done?'text-decoration:line-through;opacity:.55':''}">
+            ${esc(task.name)}
+          </b>
+        </td>
+
+        <td>${esc(stageName(project,task.stage))}</td>
+
+        <td>
+          <span class="badge ${priorityClass(task.priority)}">
+            ${esc(task.priority)}
+          </span>
+        </td>
+
+        <td>${esc(task.due || "—")}</td>
+
+        <td>
+          <button class="btn small danger" onclick="deleteTask('${task.id}')">
+            Delete
+          </button>
+        </td>
+
+      </tr>
+
+    `).join("")
+    : `<tr><td colspan="6" class="empty">No tasks yet.</td></tr>`;
+}
+
+function stageName(project,id){
+
+  if(!id) return "General / عمومی";
+
+  const stage=project.stages.find(s=>s.id===id);
+
+  return stage ? stage.name : "General / عمومی";
+}
+
+function priorityClass(priority){
+
+  if(priority==="Critical") return "red";
+  if(priority==="High") return "orange";
+  if(priority==="Low") return "green";
+
+  return "";
+}
+
+/* ---------- CALENDAR ---------- */
+
+function changeMonth(amount){
+
+  currentCalendarDate.setMonth(
+    currentCalendarDate.getMonth()+amount
+  );
+
+  renderGlobalCalendar();
+  renderWorkspaceCalendar();
+}
+
+function renderGlobalCalendar(){
+
+  const grid=document.getElementById("calendarGrid");
+
+  if(!grid) return;
+
+  renderCalendar(grid,currentProject());
+}
+
+function renderCalendar(grid,project){
+
+  const year=currentCalendarDate.getFullYear();
+  const month=currentCalendarDate.getMonth();
+
+  const first=new Date(year,month,1);
+  const last=new Date(year,month+1,0);
+
+  const monthName=first.toLocaleString(
+    state.language==="ur" ? "ur-PK":"en-US",
+    {month:"long",year:"numeric"}
+  );
+
+  const title=document.getElementById("calendarTitle");
+
+  if(title){
+    title.textContent=
+      "Calendar / کیلنڈر — "+monthName;
+  }
+
+  let html="";
+
+  const days=state.language==="ur"
+    ? ["اتوار","پیر","منگل","بدھ","جمعرات","جمعہ","ہفتہ"]
+    : ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  days.forEach(d=>{
+    html+=`<div class="cal-head">${d}</div>`;
+  });
+
+  for(let i=0;i<first.getDay();i++){
+    html+=`<div></div>`;
+  }
+
+  for(let d=1;d<=last.getDate();d++){
+
+    const dateString=
+      `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+    let events=[];
+
+    if(project){
+
+      project.tasks.forEach(t=>{
+        if(t.due===dateString){
+          events.push("✅ "+t.name);
+        }
+      });
+
+      project.stages.forEach(s=>{
+        if(s.start===dateString){
+          events.push("▶ "+s.name);
+        }
+
+        if(s.end===dateString){
+          events.push("🏁 "+s.name);
+        }
+      });
+
+      project.milestones.forEach(m=>{
+        if(m.date===dateString){
+          events.push("⭐ "+m.name);
+        }
+      });
+
+      if(project.deadline===dateString){
+        events.push("🚨 Project Deadline");
+      }
+    }
+
+    const todayClass=dateString===today()?"today":"";
+
+    html+=`
+      <div class="cal-day ${todayClass}">
+        <span>${d}</span>
+        ${events.slice(0,3).map(e=>
+          `<div class="cal-event">${esc(e)}</div>`
+        ).join("")}
+      </div>
+    `;
+  }
+
+  grid.innerHTML=html;
+}
+
+/* ---------- REPORTS ---------- */
+
+function renderReports(){
+
+  const box=document.getElementById("reportContent");
+
+  if(!box) return;
+
+  if(!currentProject()){
+
+    box.innerHTML=`
+      <div class="empty">
+        Open a project to see its report.
+      </div>`;
+
+    return;
+  }
+
+  const p=currentProject();
+
+  const totalTasks=p.tasks.length;
+  const completedTasks=p.tasks.filter(t=>t.done).length;
+
+  const totalMaterials=p.materials.length;
+
+  const fullyBought=p.materials.filter(
+    m=>remainingMaterial(m)<=0
+  ).length;
+
+  const completedStages=p.stages.filter(
+    s=>s.progress>=100
+  ).length;
+
+  const completedMilestones=p.milestones.filter(
+    m=>m.done
+  ).length;
+
+  box.innerHTML=`
+
+    <div style="display:grid;gap:11px">
+
+      <div class="setting-row">
+        <div><h4>Overall Progress</h4><p>مجموعی پیش رفت</p></div>
+        <b>${overallProgress(p)}%</b>
+      </div>
+
+      <div class="setting-row">
+        <div><h4>Building Stages</h4><p>تعمیر کے مراحل</p></div>
+        <b>${completedStages}/${p.stages.length}</b>
+      </div>
+
+      <div class="setting-row">
+        <div><h4>Materials Fully Bought</h4><p>مکمل خریدا گیا سامان</p></div>
+        <b>${fullyBought}/${totalMaterials}</b>
+      </div>
+
+      <div class="setting-row">
+        <div><h4>Tasks Completed</h4><p>مکمل کام</p></div>
+        <b>${completedTasks}/${totalTasks}</b>
+      </div>
+
+      <div class="setting-row">
+        <div><h4>Milestones</h4><p>اہم مراحل</p></div>
+        <b>${completedMilestones}/${p.milestones.length}</b>
+      </div>
+
+      <div class="setting-row">
+        <div><h4>Budget Spent</h4><p>خرچ شدہ بجٹ</p></div>
+        <b>${money(budgetSpent(p))}</b>
+      </div>
+
+    </div>
+  `;
+}
+
+/* ---------- WORKSPACE ---------- */
+
+function renderWorkspace(){
+
+  const project=currentProject();
+
+  if(!project) return;
+
+  document.getElementById("workspaceName").textContent=
+    project.icon+" "+project.name;
+
+  document.getElementById("workspaceGoal").textContent=
+    project.goal || "No project goal.";
+
+  const build=buildProgress(project);
+  const mat=materialProgress(project);
+  const task=taskProgress(project);
+  const budget=budgetProgress(project);
+  const overall=overallProgress(project);
+
+  document.getElementById("wBuildPercent").textContent=build+"%";
+  document.getElementById("wMaterialPercent").textContent=mat+"%";
+  document.getElementById("wBudgetPercent").textContent=budget+"%";
+  document.getElementById("wTaskPercent").textContent=task+"%";
+
+  document.getElementById("overallPercent").textContent=
+    overall+"%";
+
+  document.getElementById("overallBar").style.width=
+    overall+"%";
+
+  document.getElementById("goalText").textContent=
+    project.goal || "No goal added.";
+
+  renderCurrentStage(project);
+  renderTimelineInto(document.getElementById("workspaceTimeline"),project);
+  renderWorkspaceTasks(project);
+  renderWorkspaceMaterials(project);
+  renderWorkspaceBudget(project);
+  renderMilestones(project);
+  renderTeam(project);
+  renderWorkspaceCalendar();
+  renderNotes(project);
+  renderHistory(project);
+}
+
+/* ---------- CURRENT STAGE ---------- */
+
+function renderCurrentStage(project){
+
+  const box=document.getElementById("currentStageBox");
+
+  if(!box) return;
+
+  const current=project.stages.find(
+    s=>Number(s.progress)<100
+  );
+
+  if(!current){
+
+    box.innerHTML=`
+      <span class="badge green">
+        ✓ All building stages complete
+      </span>`;
+
+    return;
+  }
+
+  box.innerHTML=`
+
+    <div style="padding:14px;background:var(--panel2);border-radius:13px">
+
+      <small class="muted">
+        Current Stage / موجودہ مرحلہ
+      </small>
+
+      <h3 style="margin:6px 0">
+        ${esc(current.name)}
+      </h3>
+
+      <div class="mini-progress">
+        <span style="width:${current.progress}%"></span>
+      </div>
+
+      <p class="muted" style="font-size:11px;margin-top:6px">
+        ${current.progress}% complete
+      </p>
+
+    </div>
+  `;
+}
+
+/* ---------- WORKSPACE TASKS ---------- */
+
+function renderWorkspaceTasks(project){
+
+  const box=document.getElementById("workspaceTasks");
+
+  if(!box) return;
+
+  if(!project.tasks.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">✅</div>
+        <p>No tasks yet.</p>
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=`
+
+    <div style="margin-bottom:18px">
+
+      <div class="section-head">
+        <span>Task Progress / کام کی پیش رفت</span>
+        <b>${taskProgress(project)}%</b>
+      </div>
+
+      <div class="mini-progress big-progress">
+        <span style="width:${taskProgress(project)}%"></span>
+      </div>
+
+    </div>
+
+    ${project.tasks.map(t=>`
+
+      <div class="milestone">
+
+        <input
+          class="check"
+          type="checkbox"
+          ${t.done?"checked":""}
+          onchange="toggleTask('${t.id}')"
+        >
+
+        <div style="flex:1">
+
+          <b style="${t.done?'text-decoration:line-through;opacity:.5':''}">
+            ${esc(t.name)}
+          </b>
+
+          <p class="muted" style="font-size:11px;margin-top:4px">
+            ${esc(stageName(project,t.stage))}
+            • ${esc(t.priority)}
+            ${t.due ? " • "+esc(t.due):""}
+          </p>
+
+        </div>
+
+        <button
+          class="btn small danger"
+          onclick="deleteTask('${t.id}')">
+          ×
+        </button>
+
+      </div>
+
+    `).join("")}
+  `;
+}
+
+/* ---------- WORKSPACE MATERIALS ---------- */
+
+function renderWorkspaceMaterials(project){
+
+  const box=document.getElementById("workspaceMaterials");
+
+  if(!box) return;
+
+  if(!project.materials.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">🧱</div>
+        <p>No materials yet.</p>
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=project.materials.map(m=>{
+
+    const progress=m.required
+      ? Math.min(100,Math.round(m.bought/m.required*100))
+      : 0;
+
+    const remaining=remainingMaterial(m);
+
+    return `
+
+      <div class="card" style="margin-bottom:11px;background:var(--panel2)">
+
+        <div class="section-head">
+
+          <div>
+            <h4>${esc(m.name)}</h4>
+            <p class="muted" style="font-size:11px">
+              ${m.bought} / ${m.required} ${esc(m.unit)}
+            </p>
+          </div>
+
+          <b>${progress}%</b>
+
+        </div>
+
+        <div class="mini-progress">
+          <span style="width:${progress}%"></span>
+        </div>
+
+        <div class="project-info" style="margin-top:12px">
+
+          <div>
+            <small>Required</small>
+            <b>${m.required} ${esc(m.unit)}</b>
+          </div>
+
+          <div>
+            <small>Bought</small>
+            <b>${m.bought} ${esc(m.unit)}</b>
+          </div>
+
+          <div>
+            <small>Remaining</small>
+            <b>${remaining} ${esc(m.unit)}</b>
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          ${remaining>0
+            ? `<button class="btn small" onclick="buyMaterial('${m.id}')">
+                ＋ Record Purchase
+              </button>`
+            : `<span class="badge green">✓ Fully Purchased</span>`
+          }
+
+          <button class="btn small danger" onclick="deleteMaterial('${m.id}')">
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  }).join("");
+}
+
+/* ---------- WORKSPACE BUDGET ---------- */
+
+function renderWorkspaceBudget(project){
+
+  const spent=budgetSpent(project);
+  const remaining=Math.max(
+    0,
+    (Number(project.budget)||0)-spent
+  );
+
+  document.getElementById("wBudgetTotal").textContent=
+    money(project.budget);
+
+  document.getElementById("wBudgetSpent").textContent=
+    money(spent);
+
+  document.getElementById("wBudgetRemaining").textContent=
+    money(remaining);
+
+  const box=document.getElementById("workspaceExpenses");
+
+  if(!box) return;
+
+  if(!project.expenses.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">💰</div>
+        <p>No expenses yet.</p>
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=`
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          ${project.expenses.map(e=>`
+
+            <tr>
+              <td>${esc(e.name)}</td>
+              <td><b>${money(e.amount)}</b></td>
+              <td>${esc(e.date)}</td>
+              <td>
+                <button
+                  class="btn small danger"
+                  onclick="deleteExpense('${e.id}')">
+                  Delete
+                </button>
+              </td>
+            </tr>
+
+          `).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+  `;
+}
+
+/* ---------- MILESTONES ---------- */
+
+function renderMilestones(project){
+
+  const box=document.getElementById("milestonesList");
+
+  if(!box) return;
+
+  if(!project.milestones.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">🏁</div>
+        <p>No milestones yet.</p>
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=project.milestones.map(m=>`
+
+    <div class="milestone">
+
+      <div class="milestone-icon">${esc(m.icon)}</div>
+
+      <div style="flex:1">
+
+        <b style="${m.done?'text-decoration:line-through;opacity:.5':''}">
+          ${esc(m.name)}
+        </b>
+
+        <p class="muted" style="font-size:11px;margin-top:4px">
+          ${esc(m.date || "No date")}
+        </p>
+
+      </div>
+
+      <button
+        class="btn small ${m.done?'secondary':''}"
+        onclick="toggleMilestone('${m.id}')">
+        ${m.done?"Completed":"Complete"}
+      </button>
+
+      <button
+        class="btn small danger"
+        onclick="deleteMilestone('${m.id}')">
+        ×
+      </button>
+
+    </div>
+
+  `).join("");
+}
+
+/* ---------- TEAM ---------- */
+
+function renderTeam(project){
+
+  const box=document.getElementById("teamList");
+
+  if(!box) return;
+
+  if(!project.team.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        <div class="empty-icon">👷</div>
+        <p>No team members yet.</p>
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=project.team.map(person=>`
+
+    <div class="milestone">
+
+      <div class="milestone-icon">👷</div>
+
+      <div style="flex:1">
+
+        <b>${esc(person.name)}</b>
+
+        <p class="muted" style="font-size:11px;margin-top:4px">
+          ${esc(person.role)}
+          ${person.phone ? " • "+esc(person.phone):""}
+        </p>
+
+      </div>
+
+      <button
+        class="btn small danger"
+        onclick="deleteTeam('${person.id}')">
+        Delete
+      </button>
+
+    </div>
+
+  `).join("");
+}
+
+/* ---------- WORKSPACE CALENDAR ---------- */
+
+function renderWorkspaceCalendar(){
+
+  const box=document.getElementById("workspaceCalendar");
+
+  if(!box) return;
+
+  renderCalendar(box,currentProject());
+}
+
+/* ---------- NOTES ---------- */
+
+function renderNotes(project){
+
+  const notes=document.getElementById("projectNotes");
+
+  if(notes){
+    notes.value=project.notes || "";
+  }
+}
+
+/* ---------- HISTORY ---------- */
+
+function renderHistory(project){
+
+  const box=document.getElementById("workspaceHistory");
+
+  if(!box) return;
+
+  if(!project.history || !project.history.length){
+
+    box.innerHTML=`
+      <div class="empty">
+        No history yet.
+      </div>`;
+
+    return;
+  }
+
+  box.innerHTML=project.history.map(h=>`
+
+    <div class="activity-item">
+
+      <div class="activity-dot"></div>
+
+      <div>
+        <p>${esc(h.text)}</p>
+        <small>${esc(h.date)}</small>
+      </div>
+
+    </div>
+
+  `).join("");
+}
+
+/* ---------- MODALS ---------- */
+
+function openModal(id){
+
+  document.getElementById(id).classList.add("show");
+}
+
+function closeModal(id){
+
+  document.getElementById(id).classList.remove("show");
+}
+
+document.querySelectorAll(".modal").forEach(modal=>{
+
+  modal.addEventListener("click",e=>{
+
+    if(e.target===modal){
+      modal.classList.remove("show");
+    }
+
+  });
+
+});
+
+/* ---------- THEME ---------- */
+
+function toggleTheme(){
+
+  state.theme=state.theme==="dark" ? "light":"dark";
+
+  applyTheme();
+  saveData();
+}
+
+function applyTheme(){
+
+  document.body.classList.toggle(
+    "light",
+    state.theme==="light"
+  );
+}
+
+/* ---------- LANGUAGE ---------- */
+
+function toggleLanguage(){
+
+  state.language=state.language==="en" ? "ur":"en";
+
+  applyLanguage();
+  saveData();
+  refreshAll();
+
+  toast(
+    state.language==="ur"
+      ? "زبان اردو کر دی گئی ہے۔"
+      : "Language changed to English."
+  );
+}
+
+function applyLanguage(){
+
+  document.querySelectorAll("[data-en]").forEach(el=>{
+
+    el.textContent=
+      state.language==="ur"
+        ? el.dataset.ur
+        : el.dataset.en;
+
+  });
+
+  const btn=document.getElementById("languageBtn");
+  const settings=document.getElementById("settingsLang");
+
+  if(btn) btn.textContent=
+    state.language==="en" ? "اردو":"English";
+
+  if(settings) settings.textContent=
+    state.language==="en" ? "اردو":"English";
+}
+
+/* ---------- TOAST ---------- */
+
+let toastTimer;
+
+function toast(message){
+
+  const box=document.getElementById("toast");
+
+  box.textContent=message;
+  box.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+    box.classList.remove("show");
+  },2500);
+}
+
+/* ---------- EXPORT ---------- */
+
+function exportData(){
+
+  const data=JSON.stringify(state,null,2);
+
+  const blob=new Blob(
+    [data],
+    {type:"application/json"}
+  );
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+
+  a.href=url;
+  a.download="build-buy-planner-backup.json";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+
+  toast("Backup exported!");
+}
+
+/* ---------- IMPORT ---------- */
+
+function importData(event){
+
+  const file=event.target.files[0];
+
+  if(!file) return;
+
+  const reader=new FileReader();
+
+  reader.onload=e=>{
+
+    try{
+
+      const imported=JSON.parse(e.target.result);
+
+      if(
+        !imported ||
+        !Array.isArray(imported.projects)
+      ){
+        throw new Error("Invalid backup");
+      }
+
+      state={
+        projects:imported.projects,
+        activities:Array.isArray(imported.activities)
+          ? imported.activities
+          : [],
+        theme:imported.theme || "dark",
+        language:imported.language || "en"
+      };
+
+      currentProjectId=null;
+
+      saveData();
+      applyTheme();
+      applyLanguage();
+      refreshAll();
+
+      toast("Backup imported successfully!");
+
+    }catch(error){
+
+      toast("Invalid backup file.");
+
+    }
+
+    event.target.value="";
+  };
+
+  reader.readAsText(file);
+}
+
+/* ---------- RESET ---------- */
+
+function resetData(){
+
+  if(!confirm(
+    "Delete all planner data?\n\nThis cannot be undone."
+  )){
+    return;
+  }
+
+  localStorage.removeItem(STORAGE_KEY);
+
+  state={
+    projects:[],
+    activities:[],
+    theme:"dark",
+    language:"en"
+  };
+
+  currentProjectId=null;
+
+  createDemoProject();
+
+  applyTheme();
+  applyLanguage();
+  refreshAll();
+
+  toast("Planner reset.");
+}
+
+/* ---------- KEYBOARD ---------- */
+
+document.addEventListener("keydown",e=>{
+
+  if(e.key==="Escape"){
+
+    document.querySelectorAll(".modal.show").forEach(m=>{
+      m.classList.remove("show");
+    });
+
+  }
+
+});
+
+/* ---------- SEARCH ---------- */
+
+let searchBox=null;
+
+function enableSearch(){
+
+  if(searchBox) return;
+
+  searchBox=document.createElement("input");
+
+  searchBox.placeholder="Search projects, materials, tasks...";
+
+  searchBox.style.cssText=`
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(400px,80vw);
+    z-index:90;
+    box-shadow:0 20px 50px rgba(0,0,0,.3);
+  `;
+
+  document.body.appendChild(searchBox);
+
+  searchBox.addEventListener("input",()=>{
+    searchEverything(searchBox.value);
+  });
+
+  searchBox.focus();
+}
+
+function searchEverything(query){
+
+  query=query.trim().toLowerCase();
+
+  if(!query){
+    refreshAll();
+    return;
+  }
+
+  const matches=[];
+
+  state.projects.forEach(p=>{
+
+    if(
+      p.name.toLowerCase().includes(query) ||
+      (p.goal||"").toLowerCase().includes(query)
+    ){
+      matches.push({
+        type:"Project",
+        name:p.name,
+        id:p.id
+      });
+    }
+
+    p.materials.forEach(m=>{
+
+      if(m.name.toLowerCase().includes(query)){
+
+        matches.push({
+          type:"Material",
+          name:m.name+" — "+p.name,
+          id:p.id
+        });
+
+      }
+
+    });
+
+    p.tasks.forEach(t=>{
+
+      if(t.name.toLowerCase().includes(query)){
+
+        matches.push({
+          type:"Task",
+          name:t.name+" — "+p.name,
+          id:p.id
+        });
+
+      }
+
+    });
+
+  });
+
+  const box=document.getElementById("dashboardProjects");
+
+  if(!box) return;
+
+  box.innerHTML=matches.length
+    ? matches.map(m=>`
+      <div class="card project-card" onclick="openWorkspace('${m.id}')">
+        <span class="badge">${esc(m.type)}</span>
+        <h4 style="margin-top:8px">${esc(m.name)}</h4>
+      </div>
+    `).join("")
+    : `<div class="empty">No results found.</div>`;
+}
+
+/* Add search shortcut */
+document.addEventListener("keydown",e=>{
+
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="k"){
+
+    e.preventDefault();
+    enableSearch();
+
+  }
+
+});
+
+/* ---------- INITIAL SAFETY ---------- */
+
+window.addEventListener("beforeunload",()=>{
+  saveData();
+});
+
+</script>
+
+</body>
+</html>
